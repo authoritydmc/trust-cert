@@ -1,0 +1,67 @@
+name: Automated Version & Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Release type bump (patch, minor, major) or specific version (e.g. 1.0.1)"
+        required: true
+        default: "patch"
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Bump Version, Tag, and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump Version & Create Git Tag
+        id: bump
+        run: |
+          BUMP_TYPE="${{ github.event.inputs.bump }}"
+          NEW_VERSION=$(npm version $BUMP_TYPE -m "chore(release): v%s [skip ci]")
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "VERSION=${NEW_VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Push Commits & Tag
+        run: |
+          git push origin main --follow-tags
+
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.bump.outputs.NEW_VERSION }}
+          name: ${{ steps.bump.outputs.NEW_VERSION }}
+          generate_release_notes: true
+          files: |
+            bin/**
+            package.json
+            README.md
+            LICENSE
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
