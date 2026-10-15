@@ -1,0 +1,40 @@
+{
+  "name": "@authoritydmc/trust-cert",
+  "version": "1.0.0",
+  "description": "Zero-dependency CLI to inspect, extract, and auto-install TLS/SSL certificates and root CAs into Windows, macOS, and Linux trust stores.",
+  "main": "bin/cli.js",
+  "bin": {
+    "trust-cert": "bin/cli.js"
+  },
+  "keywords": [
+    "ssl",
+    "tls",
+    "certificate",
+    "ca",
+    "trust-store",
+    "certutil",
+    "update-ca-certificates",
+    "https",
+    "local-dev",
+    "self-signed",
+    "security"
+  ],
+  "author": "Raj Dubey <raj@rajlabs.in> (https://github.com/authoritydmc)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/authoritydmc/trust-cert.git"
+  },
+  "bugs": {
+    "url": "https://github.com/authoritydmc/trust-cert/issues"
+  },
+  "homepage": "https://github.com/authoritydmc/trust-cert#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "bin",
+    "README.md",
+    "LICENSE"
+  ]
+}
